@@ -4,7 +4,7 @@ resource "aws_s3_bucket" "data" {
   # bucket does not have access logs
   # bucket does not have versioning
   bucket        = "${local.resource_prefix.value}-data"
-  acl           = "private"
+  acl           = "public-read"
   force_destroy = true
   tags = merge({
     Name        = "${local.resource_prefix.value}-data"
@@ -22,15 +22,14 @@ resource "aws_s3_bucket" "data" {
 }
 
 
-resource "aws_s3_bucket_server_side_encryption_configuration" "data" {
-  bucket = aws_s3_bucket.data.bucket
+resource "aws_s3_bucket_versioning" "data" {
+  bucket = aws_s3_bucket.data.id
 
-  rule {
-    apply_server_side_encryption_by_default {
-      sse_algorithm     = "AES256"
-    }
+  versioning_configuration {
+    status = "Enabled"
   }
 }
+
 
 resource "aws_s3_bucket_object" "data_object" {
   bucket = aws_s3_bucket.data.id
